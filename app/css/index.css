@@ -1,0 +1,38 @@
+html{
+    position: relative;
+}
+
+button{
+    padding: 10 10;
+}
+
+#cancel{
+    background-color: red;
+}
+
+#finished{
+    background-color: green;
+}
+
+input{
+    padding: 5 5;
+    font-size: 20px;
+    align-items: left;
+}
+h1{
+    color: #009C94;
+    font-family: Helvetica;
+    margin: 20 20 20 20;
+    position: relative;
+}
+
+h3{
+    color: #ffffff;
+    font-family: Arial;
+    position: relative;
+    margin: 20 20 20 20;
+}
+
+body{
+    background-color: #00569C;
+}
