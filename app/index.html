@@ -2,30 +2,40 @@
     <head>
         <meta name = "viewport" content = "user-scalable = no, initial-scale = 1, maximum-scale = 1, minimum-scale = 1, width = device-width">
         <link rel = "stylesheet" type = "text/css" href = "css/index.css">
-        <title>How To</title>
+        <title>Nextep</title>
         <script type = "text/javascript" src = "js/index.js"></script>
     </head>
 
     <body>
+        <section id = "Header">
+            <h1>Nextep</h1>
+            <h3>A learning tool</h3>
+        </section>
 
-        <h1>Nextep</h1>
-        <h3>A learning tool</h3>
+        <section id = "navigation">
+            <button id = "newButton">New How To</button>
+            <input type = "text" id = "searchBar" placeholder = "Search...">
+            <button id = "search">Go</button>
+        </section>
 
         <section id = "main">
-            <button id = "newButton">New How To</button>
+            <section id = "recent">
+                <div id = "recentTasks">Recent Tasks</div>
+            </section>
         </section>
 
         <section id = "newHowTo">
 
             <input type = "text" name = "title" id = "taskTitle" placeholder = "Title">
+            <input type = "text" id = "stepInfo1" class = "newStep" placeholder = "Step 1">
 
-            <button id = "newStepButton">New Step</button>
 
-            <input type = "text" id = "stepInfo1" class = "newStep" placeholder = "Step 1"><br>
-
-            <button id = "finished">Finished</button>
-            <button id = "cancel">Cancel</button>
-            <button id = "clear">Clear All</button>
+            <section id = "buttons">
+                <button id = "newStepButton">New Step</button><br>
+                <button id = "finished">Finished</button><br>
+                <button id = "cancel">Cancel</button><br>
+                <button id = "clear">Clear All</button><br>
+            </section>
         </section>
 
     </body>

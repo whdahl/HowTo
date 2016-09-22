@@ -1,4 +1,4 @@
-const MAXSTEPS = 15;
+const MAXSTEPS = 10;
 
 class Task{
     constructor(title, step){
@@ -8,6 +8,7 @@ class Task{
 }
 
 var index = 1;
+var taskCount = 0;
 var stepList = {};
 var newHowTo;
 var database = window.sessionStorage;
@@ -24,12 +25,17 @@ function init(){
     document.querySelector('#finished').addEventListener('click', finished);
     document.querySelector('#newStepButton').addEventListener('click', newStep);
     document.querySelector('#clear').addEventListener('click', clearAll);
+    document.querySelector('#search').addEventListener('click', search);
     newHowTo = document.querySelector('#newHowTo');
 
     showScreen('main');
 }
 
 function newTask(){
+    if(document.querySelector('#resultsBubble') !== null){
+        var main = document.querySelector('#main');
+        main.removeChild(document.querySelector('#resultsBubble'));
+    }
     showScreen('newHowTo');
 }
 
@@ -44,21 +50,33 @@ function showScreen(id){
 }
 
 function newStep(){
+    var ul;
+    //console.log(index);
+    if(index == 1){
+        ul = document.createElement('ul');
+        ul.setAttribute('id', 'stepListul');
+        newHowTo.appendChild(ul);
+    }
     if((index + 1) <= MAXSTEPS){
-        var input = document.createElement('input');
-        input.type = 'text';
-        input.id = 'stepInfo' + (index + 1);
-        input.className = 'newStep';
-        input.placeholder = 'Step ' + (index + 1);
-        input.style.left = 20 + '%';
-        input.style.top = 20+(index*10)+'%';
-        console.log(input.style.top);
-        newHowTo.appendChild(input);
-        //index++;
+        var newStep = document.createElement('input');
+        newStep.type = 'text';
+        newStep.id = 'stepInfo' + (index + 1);
+        newStep.className = 'newStep';
+        newStep.placeholder = 'Step ' + (index + 1);
+        newStep.style.position = 'absolute';
+        newStep.style.left = 20 + '%';
+        newStep.style.top = 10+(index*10)+'%';
+        newHowTo.appendChild(newStep);
 
-        if(document.querySelector('#stepInfo' + (index) != null)){
+        /*var lastStep = document.createElement('li');
+        var list = document.querySelector('#stepListul');
+        lastStep.appendChild(document.createTextNode(document.querySelector('#stepInfo' + index).value));
+        list.appendChild(lastStep);
+        //newHowTo.removeChild(document.querySelector('#stepInfo'+index));
+
+        /*if(document.querySelector('#stepInfo' + (index) != null)){
             var stepInfo = document.querySelector('#stepinfo' + (index)).value;
-        }
+        }*/
         index++;
     }
     else{
@@ -66,8 +84,81 @@ function newStep(){
     }
 }
 
+function search(){
+    var query = document.querySelector('#searchBar').value;
+
+    if(query.length == 0){
+        return;
+    }
+
+    if(document.querySelector('#resultsBubble') != null){
+        var main = document.querySelector('#main');
+        main.removeChild(document.querySelector('#resultsBubble'));
+    }
+    var results = {};
+    var resultsIndex = 0;
+    var keys = Object.keys(database);
+    // console.log(database);
+    //console.log(keys[1]);
+    // console.log(query);
+
+    for(var keynum = 0; keynum < Object.keys(database).length; keynum++){
+        if(keys[keynum].indexOf(query) !== -1){
+            //console.log(keys[keynum]);
+            //add this to the list of tasks that are found to include the query
+            results[resultsIndex] = keys[keynum];
+            resultsIndex++;
+        }
+    }
+    console.log(results);
+    displayResults(results);
+}
+
+function displayResults(list){
+    showScreen('main');
+
+    var main = document.querySelector('#main');
+
+    var resultsBubble = document.createElement('div');
+    resultsBubble.id = 'resultsBubble';
+
+    var closeButton = document.createElement('button');
+    closeButton.innerHTML = 'X';
+    closeButton.id = 'closeButton';
+    closeButton.onclick = function(){main.removeChild(resultsBubble);};
+
+    var ul = document.createElement('ul');
+    ul.id = 'resultsList';
+
+    console.log(Object.keys(list).length);
+
+    for(var i = 0; i < Object.keys(list).length; i++){
+        var li = document.createElement('li');
+        var button = document.createElement('button');
+        var item = list[i];
+
+        button.id = 'whatever';
+        button.innerHTML = list[i];
+        button.onclick = function(){
+            displayTask(item);
+            console.log(item);
+        };
+
+        li.appendChild(button);
+        ul.appendChild(li);
+    }
+    resultsBubble.appendChild(ul);
+    resultsBubble.appendChild(closeButton);
+    main.appendChild(resultsBubble);
+}
+
 function finished(){
     var title = document.querySelector('#taskTitle').value;
+
+    if(title.length == 0){
+        alert('You must give your task a title');
+        return;
+    }
 
     for(var i = 1; i <= MAXSTEPS; i++)
     {
@@ -83,9 +174,49 @@ function finished(){
     //console.log(task);
 
     database.setItem(title, JSON.stringify(task));
-    console.log(JSON.parse(database.getItem(title)));
+    var recent = document.querySelector('#recentTasks');
+    var recentTaskButton = document.createElement('button');
+    recentTaskButton.innerHTML = title;
+    recentTaskButton.id = 'recentTaskButton';
+    recentTaskButton.onclick = function(){displayTask(title);}//console.log(JSON.parse(window.sessionStorage.getItem(title)));};
+    recent.appendChild(recentTaskButton);
+
     clearAll();
     showScreen('main');
+}
+
+function displayTask(name){
+    var main = document.querySelector('#main');
+    if(document.querySelector('#resultsBubble') !== null){
+        main.removeChild(document.querySelector('#resultsBubble'));
+    }
+    var oldTask = document.querySelector('#taskBubble')
+    if(oldTask != null){
+        main.removeChild(oldTask);
+    }
+
+    var taskBubble = document.createElement('div');
+    var closeButton = document.createElement('button');
+    closeButton.innerHTML = 'X';
+    closeButton.id = 'closeButton';
+    closeButton.onclick = function(){main.removeChild(taskBubble);};
+    taskBubble.id = 'taskBubble';
+    var ol = document.createElement('ol');
+    ol.id = 'taskList';
+    ol.innerHTML = name;
+
+    var _task = JSON.parse(database.getItem(name));
+    var keycount = Object.keys(_task.step).length;
+    for(var keynum = 1; keynum <= keycount; keynum++){
+        console.log(_task.step[keynum]);
+        var li = document.createElement('li');
+        li.appendChild(document.createTextNode(_task.step[keynum]));
+        ol.appendChild(li);
+    }
+
+    taskBubble.appendChild(ol);
+    taskBubble.appendChild(closeButton);
+    main.appendChild(taskBubble);
 }
 
 function clearAll(){
@@ -106,5 +237,7 @@ function clearAll(){
     }
     while(index > 1)
     document.getElementById('taskTitle').value = '';
+
+    //newHowTo.removeChild(document.querySelector('#stepListul'));
     index = 1;
 }
