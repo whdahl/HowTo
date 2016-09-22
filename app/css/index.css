@@ -22,6 +22,19 @@ button{
 button:hover{
     background-color: rgba(255,255,255,1);
 }
+
+ul button{
+    margin: 0;
+    top: -30px;
+    width: 120px;
+}
+
+div ul{
+    left: 0%;
+    top: 0%;
+}
+
+
 #resultsBubble{
     position: absolute;
     background-color: rgba(255, 255, 255, 1);

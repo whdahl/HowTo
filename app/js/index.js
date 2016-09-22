@@ -29,6 +29,11 @@ function init(){
     newHowTo = document.querySelector('#newHowTo');
 
     showScreen('main');
+    console.log(Object.keys(database).length);
+    var results = Object.keys(database);
+    for(var i = 0; i < Object.keys(database).length; i++){
+        updateRecentTasks(results[i]);
+    }
 }
 
 function newTask(){
@@ -51,12 +56,14 @@ function showScreen(id){
 
 function newStep(){
     var ul;
-    //console.log(index);
+
     if(index == 1){
         ul = document.createElement('ul');
         ul.setAttribute('id', 'stepListul');
+
         newHowTo.appendChild(ul);
     }
+
     if((index + 1) <= MAXSTEPS){
         var newStep = document.createElement('input');
         newStep.type = 'text';
@@ -66,17 +73,9 @@ function newStep(){
         newStep.style.position = 'absolute';
         newStep.style.left = 20 + '%';
         newStep.style.top = 10+(index*10)+'%';
+
         newHowTo.appendChild(newStep);
 
-        /*var lastStep = document.createElement('li');
-        var list = document.querySelector('#stepListul');
-        lastStep.appendChild(document.createTextNode(document.querySelector('#stepInfo' + index).value));
-        list.appendChild(lastStep);
-        //newHowTo.removeChild(document.querySelector('#stepInfo'+index));
-
-        /*if(document.querySelector('#stepInfo' + (index) != null)){
-            var stepInfo = document.querySelector('#stepinfo' + (index)).value;
-        }*/
         index++;
     }
     else{
@@ -85,6 +84,9 @@ function newStep(){
 }
 
 function search(){
+    if(document.querySelector('#taskBubble') != null){
+        document.querySelector('#main').removeChild(document.querySelector('#taskBubble'));
+    }
     var query = document.querySelector('#searchBar').value;
 
     if(query.length == 0){
@@ -98,19 +100,13 @@ function search(){
     var results = {};
     var resultsIndex = 0;
     var keys = Object.keys(database);
-    // console.log(database);
-    //console.log(keys[1]);
-    // console.log(query);
 
     for(var keynum = 0; keynum < Object.keys(database).length; keynum++){
         if(keys[keynum].indexOf(query) !== -1){
-            //console.log(keys[keynum]);
-            //add this to the list of tasks that are found to include the query
             results[resultsIndex] = keys[keynum];
             resultsIndex++;
         }
     }
-    console.log(results);
     displayResults(results);
 }
 
@@ -130,7 +126,6 @@ function displayResults(list){
     var ul = document.createElement('ul');
     ul.id = 'resultsList';
 
-    console.log(Object.keys(list).length);
 
     for(var i = 0; i < Object.keys(list).length; i++){
         var li = document.createElement('li');
@@ -139,13 +134,14 @@ function displayResults(list){
 
         button.id = 'whatever';
         button.innerHTML = list[i];
-        button.onclick = function(){
-            displayTask(item);
-            console.log(item);
-        };
+
+
+        //holy shit this worked
+        button.onclick = displayTask.bind(null, item);
 
         li.appendChild(button);
         ul.appendChild(li);
+        //resultsBubble.appendChild(ul);
     }
     resultsBubble.appendChild(ul);
     resultsBubble.appendChild(closeButton);
@@ -171,21 +167,27 @@ function finished(){
     }
 
     var task = new Task(title, stepList);
-    //console.log(task);
 
     database.setItem(title, JSON.stringify(task));
-    var recent = document.querySelector('#recentTasks');
-    var recentTaskButton = document.createElement('button');
-    recentTaskButton.innerHTML = title;
-    recentTaskButton.id = 'recentTaskButton';
-    recentTaskButton.onclick = function(){displayTask(title);}//console.log(JSON.parse(window.sessionStorage.getItem(title)));};
-    recent.appendChild(recentTaskButton);
+    updateRecentTasks(title);
+
+
 
     clearAll();
     showScreen('main');
 }
 
+function updateRecentTasks(title){
+    var recent = document.querySelector('#recentTasks');
+    var recentTaskButton = document.createElement('button');
+    recentTaskButton.innerHTML = title;
+    recentTaskButton.id = 'recentTaskButton';
+    recentTaskButton.onclick = function(){displayTask(title);};
+    recent.appendChild(recentTaskButton);
+}
+
 function displayTask(name){
+
     var main = document.querySelector('#main');
     if(document.querySelector('#resultsBubble') !== null){
         main.removeChild(document.querySelector('#resultsBubble'));
@@ -196,11 +198,14 @@ function displayTask(name){
     }
 
     var taskBubble = document.createElement('div');
+    taskBubble.id = 'taskBubble';
+
     var closeButton = document.createElement('button');
     closeButton.innerHTML = 'X';
     closeButton.id = 'closeButton';
     closeButton.onclick = function(){main.removeChild(taskBubble);};
-    taskBubble.id = 'taskBubble';
+
+
     var ol = document.createElement('ol');
     ol.id = 'taskList';
     ol.innerHTML = name;
@@ -208,7 +213,6 @@ function displayTask(name){
     var _task = JSON.parse(database.getItem(name));
     var keycount = Object.keys(_task.step).length;
     for(var keynum = 1; keynum <= keycount; keynum++){
-        console.log(_task.step[keynum]);
         var li = document.createElement('li');
         li.appendChild(document.createTextNode(_task.step[keynum]));
         ol.appendChild(li);
@@ -223,6 +227,7 @@ function clearAll(){
     var newHowTo = document.querySelector('#newHowTo');
     var x = document.querySelector('#stepInfo1');
     x.value = '';
+
     do{
         if(index > 1){
             x = document.querySelector('#stepInfo' + index);
@@ -238,6 +243,5 @@ function clearAll(){
     while(index > 1)
     document.getElementById('taskTitle').value = '';
 
-    //newHowTo.removeChild(document.querySelector('#stepListul'));
     index = 1;
 }
