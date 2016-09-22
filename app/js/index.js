@@ -183,7 +183,8 @@ function updateRecentTasks(title){
     recentTaskButton.innerHTML = title;
     recentTaskButton.id = 'recentTaskButton';
     recentTaskButton.onclick = function(){displayTask(title);};
-    recent.appendChild(recentTaskButton);
+    //recent.appendChild(recentTaskButton);
+    recent.insertBefore(recentTaskButton, recent.childNodes[1]);
 }
 
 function displayTask(name){
