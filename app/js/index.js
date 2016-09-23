@@ -159,6 +159,12 @@ function finished(){
     for(var i = 1; i <= MAXSTEPS; i++)
     {
         var x = document.querySelector('#stepInfo' + i).value;
+        console.log(x.length);
+        if(x.length == 0){
+            alert('Step ' + i + ' can not be blank');
+            i = 1;
+            return;
+        }
         stepList[i] = x;
         if(document.querySelector('#stepInfo' + (i+1)) == null){
             console.log(i + ' steps, terminating loop');
