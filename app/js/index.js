@@ -10,7 +10,7 @@ class Task{
 var index = 1;
 var taskCount = 0;
 var stepList = {};
-var newHowTo;
+var newHowTo, main;
 var database = window.sessionStorage;
 
 document.addEventListener(
@@ -21,12 +21,13 @@ document.addEventListener(
 
 function init(){
     document.querySelector('#newButton').addEventListener('click', newTask/*showScreen.bind(null,'newHowTo')*/);
-    document.querySelector('#cancel').addEventListener('click', showScreen.bind(null, 'main'));
+    document.querySelector('#cancel').addEventListener('click', cancel);
     document.querySelector('#finished').addEventListener('click', finished);
     document.querySelector('#newStepButton').addEventListener('click', newStep);
-    document.querySelector('#clear').addEventListener('click', clearAll);
+    document.querySelector('#clear').addEventListener('click', removeStep);
     document.querySelector('#search').addEventListener('click', search);
     newHowTo = document.querySelector('#newHowTo');
+    main     = document.querySelector('#main');
 
     showScreen('main');
     console.log(Object.keys(database).length);
@@ -36,9 +37,13 @@ function init(){
     }
 }
 
+function cancel(){
+    clearAll();
+    showScreen('main');
+}
+
 function newTask(){
     if(document.querySelector('#resultsBubble') !== null){
-        var main = document.querySelector('#main');
         main.removeChild(document.querySelector('#resultsBubble'));
     }
     showScreen('newHowTo');
@@ -83,6 +88,20 @@ function newStep(){
     }
 }
 
+function removeStep(){
+    if(index > 1){
+        x = document.querySelector('#stepInfo' + index);
+        if(x != null){
+            x.value = '';
+            newHowTo.removeChild(x);
+            index--;
+            console.log(index);
+        }
+
+        x = document.querySelector('#stepInfo' + index);
+    }
+}
+
 function search(){
     if(document.querySelector('#taskBubble') != null){
         document.querySelector('#main').removeChild(document.querySelector('#taskBubble'));
@@ -94,7 +113,6 @@ function search(){
     }
 
     if(document.querySelector('#resultsBubble') != null){
-        var main = document.querySelector('#main');
         main.removeChild(document.querySelector('#resultsBubble'));
     }
     var results = {};
@@ -107,13 +125,15 @@ function search(){
             resultsIndex++;
         }
     }
+
+    if(Object.keys(results).length == 0){
+        console.log('no results');
+    }
     displayResults(results);
 }
 
 function displayResults(list){
     showScreen('main');
-
-    var main = document.querySelector('#main');
 
     var resultsBubble = document.createElement('div');
     resultsBubble.id = 'resultsBubble';
@@ -195,7 +215,6 @@ function updateRecentTasks(title){
 
 function displayTask(name){
 
-    var main = document.querySelector('#main');
     if(document.querySelector('#resultsBubble') !== null){
         main.removeChild(document.querySelector('#resultsBubble'));
     }
